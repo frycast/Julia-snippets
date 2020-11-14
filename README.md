@@ -1,2 +1,2 @@
 # Snippets
- Snippets for julia practice
+ My personal snippets for Julia practice and learning
