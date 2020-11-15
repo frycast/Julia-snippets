@@ -293,3 +293,83 @@ end
 map(1:3) do _
   [1 2; 3 4]
 end
+
+## % explanation of @view, @views and slices
+# Indexing (with range or integer) creates a copy (slice)
+a = [1,2,3]
+b = a[1:2]
+b[1] = 2
+a
+# Array assignment creates a reference 
+a = [1,2,3]
+b = a
+b[1] = 2
+a
+# view can create a reference to a range (a view)
+a = [1,2,3]
+b = view(a, 1:2)
+b[1] = 2
+a
+# @view macro can be used instead of view
+a = [1,2,3]
+b = @view a[1:2]
+b[1] = 2
+a
+# @views macro converts block of code swapping slices for views
+a = [1,2,3]
+@views begin
+  b = a[1:2]
+  c = a[1:2]
+end
+@views d = a[1:2]
+b[1] = 2
+a
+c[1] = 3
+a
+d[1] = 4
+a
+
+## %% @. macro converts blocks of code to broadcast
+# but be wary it converts every function call, even =
+# hence arr1 and arr2 need to be defined in advance here:
+arr1, arr2 = zeros(3), zeros(3)
+@. begin
+  arr1 = [1,2,3] ^ 2
+  arr2 = [1,2,3] ^ 3
+end
+arr1, arr2
+
+## %% view macro for removing unnecessary allocations
+# and also using the @. macro to vectorise.
+function heavy(n, vec1, vec2)
+  for i in 1:2:n-1
+    vec1[i:i+1] = vec2[i:i+1] .^ i
+  end
+  return nothing
+end
+function light(
+  n::Int64, vec1::Vector{Float64}, vec2::Vector{Float64})
+  for i in 1:2:n-1
+    @views @. vec1[i:i+1] = vec2[i:i+1] ^ i
+  end
+  return nothing
+end
+using BenchmarkTools
+n = 10_000
+vec1, vec2 = zeros(n), randn(n)
+@benchmark heavy(n, vec1, vec2)
+@benchmark light(n, vec1, vec2)
+
+
+## %% An array of named tuples can have
+# its tuples summed elementwise using sum
+# with getfield
+A = [(S = [1,2],I = [1,2]),
+     (S = [3,4],I = [3,4]),
+     (S = [5,6],I = [5,6])]
+sum(x->x.I, A) / length(A)
+
+
+## %% append to end of array
+a = [1,2,3]
+append!(a, [1,2,3])
