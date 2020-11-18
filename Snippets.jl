@@ -255,6 +255,10 @@ myshoes = [Shoe(true, i) for i in 1:10]
 @code_lowered myshoes[1].size
 getfield.(myshoes, :size) # remember to use Symbol type here
 
+## %% Broadcasting the . operator can be done more easily with nested .
+get_size(myshoe) = myshoe.size
+get_size.(myshoes)
+
 ## %% function vs begin block vs let block
 function f()
   # Always returns one object.
@@ -373,3 +377,66 @@ sum(x->x.I, A) / length(A)
 ## %% append to end of array
 a = [1,2,3]
 append!(a, [1,2,3])
+
+## %% There are many infixable Julia function names
+# See the list: https://github.com/JuliaLang/julia/blob/master/src/julia-parser.scm#L23-L24
+⊕(a,b) = a .+ b
+[1,2,3] ⊕ [1,2,3]
+
+## %% rand can be used to randomly return an element of a vector
+rand([1,2,3])
+
+## %% accumulate works like R cumsum, but is more general, using any accumulator
+accumulate(+, 1:10)
+
+## %% a bounding box [-L,L]x[-L,L] boundary collision can
+# be created by exploiting 2 kinds of symmetry:
+struct Coordinate
+  x::Int64
+  y::Int64
+end
+Coordinate() = Coordinate(0,0)
+function collide_boundary(x::Int64, L::Number)
+  if (abs(x) > L) x = sign(x)*L end
+  return x	
+end
+function collide_boundary(c::Coordinate, L::Number)
+  return Coordinate(collide_boundary(c.x, L), collide_boundary(c.y, L))
+end
+
+## %% To overload the + function in Base we need to use the Symbol :+
+function Base.:+(a::Coordinate, b::Coordinate)
+  return Coordinate(a.x + b.x, a.y + b.y)
+end
+
+## %% an anonymous function can take two arguments, for example:
+possible_moves = [
+ 	Coordinate( 1, 0), 
+ 	Coordinate( 0, 1), 
+ 	Coordinate(-1, 0), 
+ 	Coordinate( 0,-1),
+]
+function trajectory(c::Coordinate, n::Int, L::Number)
+	return accumulate((c1,c2)->collide_boundary(c1+c2,L), vcat(c,rand(possible_moves, n)))
+end
+
+## %% Simple plot example of many random walks, using the trajectory function above
+using Plots
+function plot_trajectory!(p::Plots.Plot, trajectory::Vector; kwargs...)
+	plot!(p, (c->(c.x,c.y)).(trajectory); 
+		label=nothing, 
+		linewidth=2, 
+		linealpha=LinRange(1.0, 0.2, length(trajectory)),
+		kwargs...)
+end
+let
+	p = plot(ratio=1)
+	for _ in 1:10
+		long_trajectory = trajectory(Coordinate(), 1000, 20)
+		plot_trajectory!(p, long_trajectory)
+	end
+	p
+end
+
+## %% Floor a number and convert to Int
+floor(Int, L)
