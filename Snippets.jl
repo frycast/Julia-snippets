@@ -440,3 +440,22 @@ end
 
 ## %% Floor a number and convert to Int
 floor(Int, L)
+
+## %% Generated functions generate specialised code
+# depending on the types of the arguments, with more
+# flexibility and/or less code than multiple dispatch.
+# Generated function gets expanded at a time when the
+# types of the arguments are known, but the function is
+# not yet compiled.
+# In the body we only have access to types, not values.
+# Returns a quoted expression, that is compiled and then run.
+# They must not mutate or observe non-constant global states.
+@generated function foo(x)
+  Core.println(x)
+  return :(x * x)
+end
+foo(2)
+foo("bar")
+foo(4)     # The result foo(2) was cached 
+foo("bat") # The result foo("bar") was also cached
+
