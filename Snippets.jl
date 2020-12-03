@@ -1,3 +1,10 @@
+#= Resources
+* Mike Innes stuff is great, including 'The Many Types of Types'
+  https://mikeinnes.github.io/2020/05/19/types.html
+
+
+=#
+
 ## %%
 # Use || rather than | for short circuit evaluation
 # true   | error()  # returns error
@@ -458,4 +465,31 @@ foo(2)
 foo("bar")
 foo(4)     # The result foo(2) was cached 
 foo("bat") # The result foo("bar") was also cached
+
+## %% You can replace the default constructor in a struct
+struct MyThing
+  x::Int64
+  MyThing(x) = (x <= 0) ? error("no good") : new(x)
+end
+struct MyThing2
+  x::Int64
+  MyThing2() = new(1)
+end
+struct MyThing3
+  x::Int64
+end
+MyThing3() = MyThing3(1)
+
+## %% "Static type" and "dynamic tag" are both referred to
+# as 'type' (confusingly)
+function f()::Union{Int, String} # static type
+  if ( rand() < 0.5 ) 
+    return 1
+  else 
+    return "1"
+  end
+end
+
+x = f() # x now has dynamic type either Int or String, not the union.
+typeof(x)
 
