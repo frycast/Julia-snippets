@@ -493,3 +493,14 @@ end
 x = f() # x now has dynamic type either Int or String, not the union.
 typeof(x)
 
+## %% Broadcasting on multiple arguments
+f(x::Int64,y::Int64,z::Int64) = x + y + z
+g(x::Int64,y::Vector{Int64},z::Int64) = x + sum(y) + z
+# f will broadcast over whatever arguments are passed as vectors
+f.([1,2,3], 1, 1)
+f.([1,2,3], [1,2,3], 1)
+# even though parameter y of g is a vector type, g will broadcast over y
+g.(1, [1,2], 1)
+
+## %% Instead of sum(a .== b) we can use count(predicate, iter)
+count(==(1), [1,2,1,3,1,1])
