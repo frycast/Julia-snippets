@@ -504,3 +504,12 @@ g.(1, [1,2], 1)
 
 ## %% Instead of sum(a .== b) we can use count(predicate, iter)
 count(==(1), [1,2,1,3,1,1])
+
+## %% Returning a function is useful for plotting derivatives
+function finite_difference_slope(f::Function, a, h=1e-3)
+	return (f(a+h)- f(a))/h
+end
+function tangent_line(f, a, h)
+	m = finite_difference_slope(f,a,h)
+	return x -> m*(x-a) + f(a)
+end
