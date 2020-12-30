@@ -534,7 +534,3 @@ using LinearAlgebra
 M = rand(5,5)
 M = triu(M,1)
 M = max.(M,M')
-
-tril(M) = M'
-
-tril(M) = triu(M)
