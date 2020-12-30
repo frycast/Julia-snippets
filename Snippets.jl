@@ -1,8 +1,6 @@
 #= Resources
 * Mike Innes stuff is great, including 'The Many Types of Types'
   https://mikeinnes.github.io/2020/05/19/types.html
-
-
 =#
 
 ## %%
@@ -47,7 +45,14 @@ filter(x -> x == 0, [0,1,2,0])
 
 ## %%
 # Dump contents (like str in R)
+expr2 = Dict("a" => 1.0, "b" => 2.0)
 dump(expr2)
+struct MyStruct
+  foo::Int
+  bar::String
+end
+m = MyStruct(1, "a")
+dump(m)
 
 ## %%
 # Find out which function is called
@@ -513,3 +518,23 @@ function tangent_line(f, a, h)
 	m = finite_difference_slope(f,a,h)
 	return x -> m*(x-a) + f(a)
 end
+
+## %% Generate a nxn random matrix
+n = 5
+M = rand(n,n)
+
+## %% Upper and lower triangles
+using LinearAlgebra
+M = rand(5,5)
+triu(M,1) # starting from the 1st superdiagonal (note 0 gives diagonal too)
+tril(M,-1) # and negative numbers give subdiagonals
+
+## %% We can copy the upper triangle to the (0) lower triangle using max
+using LinearAlgebra
+M = rand(5,5)
+M = triu(M,1)
+M = max.(M,M')
+
+tril(M) = M'
+
+tril(M) = triu(M)
