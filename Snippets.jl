@@ -534,3 +534,41 @@ using LinearAlgebra
 M = rand(5,5)
 M = triu(M,1)
 M = max.(M,M')
+
+## %% The identity matrix I is defined in LinearAlgebra
+using LinearAlgebra
+I
+ones(Int, 3, 3) - I
+
+## %% SparseArrays defines a sparse zeros matrix
+using SparseArrays
+spzeros(Bool, 3, 3)
+
+## %% findfirst gives the first index in the array for which the condition is satisfied
+k = 5
+c = cumsum([0.1, 0.2, 0.1, 0.1, 0.4, 0.1])
+r = rand(k)
+map( x -> findfirst(c .> x), r )
+
+## %% Packages from pagerank "important"
+# HTTP
+# Dates
+# JSON
+# DataFrames
+# Requires
+# Distributed
+# DataStructures
+# Random
+# Compat
+# Reexport
+# StatsBase
+# SparseArrays
+# LinearAlgebra
+# Statistics
+# Distributions
+# StaticArrays
+# Test
+
+## %% Dict comprehension
+keys = ["a","b","c"]
+Dict(keys[i] => i-1 for i = 1:length(keys))
