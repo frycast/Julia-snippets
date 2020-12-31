@@ -1,6 +1,8 @@
 #= Resources
 * Mike Innes stuff is great, including 'The Many Types of Types'
   https://mikeinnes.github.io/2020/05/19/types.html
+
+* DataFrames indexing https://dataframes.juliadata.org/stable/lib/indexing/#getindex-and-view-1
 =#
 
 ## %%
@@ -572,3 +574,11 @@ map( x -> findfirst(c .> x), r )
 ## %% Dict comprehension
 keys = ["a","b","c"]
 Dict(keys[i] => i-1 for i = 1:length(keys))
+
+## %% Reference (not copy) to DataFrames vector using bang (!)
+# https://dataframes.juliadata.org/stable/lib/indexing/#getindex-and-view-1
+using DataFrames
+df = DataFrame(A = 1:4, B = ["M", "F", "F", "M"])
+df[:,2] # This makes copy
+df[!,2] # This makes a reference
+df[!,2] .= 1 # So, e.g., I can set with side effects
