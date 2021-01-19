@@ -3,7 +3,12 @@
   https://mikeinnes.github.io/2020/05/19/types.html
 
 * DataFrames indexing https://dataframes.juliadata.org/stable/lib/indexing/#getindex-and-view-1
+
+* writing macros https://www.geeksforgeeks.org/expressions-and-macros-in-julia/
 =#
+
+## %% Return the directory of the file containing the macrocall
+@__DIR__
 
 ## %%
 # Use || rather than | for short circuit evaluation
@@ -582,3 +587,98 @@ df = DataFrame(A = 1:4, B = ["M", "F", "F", "M"])
 df[:,2] # This makes copy
 df[!,2] # This makes a reference
 df[!,2] .= 1 # So, e.g., I can set with side effects
+
+## %% Create a range with fixed length like R seq
+range(1; step = 0.1, length = 5)
+
+## %% Extract the step size from a range
+ran = 1:0.5:10
+step(ran)
+
+## %% repeat the same vector
+repeat([1], 5)
+
+## %% LinearAlgebra has a normalize function
+using LinearAlgebra
+normalize([-1,3])
+
+## %% StaticArrays has SVector which indicates
+# that the vector size is known in advance 
+# leading to performance improvements
+using StaticArrays
+function myslowfunc()
+  for _ in 1:10_000_000
+    a = [rand(1:12) for _ in 1:20]
+    b = [sum(a.==i) for i in 1:12]
+  end
+end
+function myfastfunc()
+  for _ in 1:10_000_000
+    a = @SVector [rand(1:12) for _ in 1:20]
+    b = @SVector [sum(a.==i) for i in 1:12]
+  end
+end
+using BenchmarkTools
+@benchmark myslowfunc()
+@benchmark myfastfunc()
+
+## %% Create expressions with the : symbol
+a = :(1+2)
+typeof(a)
+eval(a)
+my_exp = Expr(:(=), :x, 10)
+my_exp.head # This is an assignment
+eval(my_exp)
+x
+s = "a=11"
+s = Meta.parse(s)
+eval(s)
+a
+Expr(:call, :+, :a, Expr(:call, :*, :b, :c), 10)
+
+## %% Create multi-line expressions with quote
+m = quote 
+  a = 10
+  b = 20
+  a + b
+end
+
+## %% literals can be interpolated into an expression
+# (i.e., values can be assigned in an expression using $)
+a = 10
+:($a + b)
+p = :(i in $:((1,2,3)))
+
+## %% An array of expressions can be interpolated
+exps = [:a, :b, :c]
+:(f(1, $(exps...)))
+
+## %% Example of writing own macro
+# Macros convert the argument to an expression
+macro e(x)
+  if typeof(x) == Expr
+    println(x.args)
+  end
+  return x
+end
+@e 10 + x
+@e :(10 + x) # println((:(:(10+x))).args)
+
+## %% Expressions have fields that we can access
+a = :([i for i in 1:10])
+a.head
+a.args
+
+## %% A number is not an expression, and
+# can't be made into an expression on its own
+typeof(:(10))
+
+
+
+
+
+
+
+
+
+
