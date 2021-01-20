@@ -673,12 +673,17 @@ a.args
 # can't be made into an expression on its own
 typeof(:(10))
 
+## %% Create and fill an N-dimensional array that has chosen size along each axis
+A = fill(5.0, (3,3,3))
 
+## %% Create a tuple of length n, computing each element as f(i), where i is the index of the element.
+ntuple(i->3*i, 3)
 
-
-
-
-
-
-
-
+## %% Using a value type to eliminate type-instability in array of arbitrarily defined dimension
+# By passing N as a type parameter, we make its value known to the compiler, allowing the compiler to predict the
+# return type. See https://docs.julialang.org/en/v1/manual/performance-tips/#man-performance-tips
+# Val(T) works only when T is either hard-coded/literal (Val(3)) or already specified in the type-domain.
+function array(fillval, ::Val{N}) where N
+  fill(fillval, ntuple(d->3, Val(N)))
+end
+array(5.0, Val(2))
