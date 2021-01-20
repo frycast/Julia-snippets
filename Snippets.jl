@@ -51,7 +51,8 @@ map(x -> x == 0, [0,1,2,0])
 filter(x -> x == 0, [0,1,2,0])
 
 ## %%
-# Dump contents (like str in R)
+# Dump contents (kind of like str in R).
+# View the data representation of an expression (or value).
 expr2 = Dict("a" => 1.0, "b" => 2.0)
 dump(expr2)
 struct MyStruct
@@ -60,6 +61,15 @@ struct MyStruct
 end
 m = MyStruct(1, "a")
 dump(m)
+expr = :(2a+b+1)
+dump(expr)
+expr.args[2].args
+# The same thing can be achieved on code with @dump
+Meta.@dump 2a+b+1
+
+
+## %% show_expr view the expression as a lisp-style S-expression
+Meta.show_sexpr(:(2a+b+1))
 
 ## %%
 # Find out which function is called
@@ -687,3 +697,5 @@ function array(fillval, ::Val{N}) where N
   fill(fillval, ntuple(d->3, Val(N)))
 end
 array(5.0, Val(2))
+
+
